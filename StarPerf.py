@@ -1,18 +1,17 @@
-'''
+"""
 
 StarPerf 2.0
 
 Python version requirements : Python 3.10
 
-'''
+"""
+
 
 # Entrance of StarPerf
 
 
-
 def main():
     print("\033[31mStarting StarPerf...\033[0m")
-
 
     print("\t\033[31mStarting XML Constellations Testing...\033[0m")
     # test the core module functionality of various XML constellations
@@ -38,10 +37,8 @@ def main():
     KITS_TEST_CASES.kits_test_cases()
     print("\t\033[31mEND.\033[0m")
 
-
     print("\033[31mEND.\033[0m")
+
 
 if __name__ == '__main__':
     main()
-
-
