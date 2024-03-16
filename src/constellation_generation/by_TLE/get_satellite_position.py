@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -7,8 +7,10 @@ Date : 2023/11/26
 Function : This script is used to parse the longitude, latitude and altitude position information of the satellite at
            a specified time from TLE data.
 
-'''
+"""
+
 from skyfield.api import load, EarthSatellite
+
 
 # analyze the satellite's latitude, longitude and altitude position based on TLE data and specified time
 # Parameter :
@@ -22,8 +24,6 @@ def get_satellite_position(TLE, year, month, day, hour, minute, second):
     ts = load.timescale()
     # specify a specific UTC time point
     t = ts.utc(year, month, day, hour, minute, second)
-    # parse TLE data and obtain satellite position information
-    num_satellites = len(TLE) // 2
     satellite_positions = []
     for i in range(0, len(TLE), 2):
         tle_line1 = TLE[i].strip()

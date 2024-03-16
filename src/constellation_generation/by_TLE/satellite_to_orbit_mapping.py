@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -15,18 +15,22 @@ Function : The orbits within a shell are derived based on a clustering algorithm
            satellite in the shell object to obtain several orbits, and then assign all satellites in the shell to these
            orbits.
 
-'''
+"""
+
+import time
 import jenkspy
 import src.TLE_constellation.constellation_entity.orbit as ORBIT
 import matplotlib.pyplot as plt
+
 
 # Parameter :
 # shells : a collection of shell objects that have established corresponding relationships
 # Return Value :
 # after the function is executed, the mapping relationship between satellite, orbit, and shell has been established
 # without any return value.
-def satellite_to_orbit_mapping(shells):
-    for sh in shells:
+def satellite_to_orbit_mapping(shells, constellation_name):
+    orbits_number_of_starlink = [1, 7, 5, 21, 72, 23, 28, 72]
+    for idx, sh in enumerate(shells):
         # extract the raan of all satellites in sh
         raans = []
         for sat in sh.satellites:
@@ -37,14 +41,19 @@ def satellite_to_orbit_mapping(shells):
         plt.ylabel('RAANS')
         plt.show()
 
-        orbits_number = int(input('\t\t\tPlease enter the number of orbits (integer) based on the raan distribution result of '
-                              'the line chart : '))
-        breaks = jenkspy.jenks_breaks(values = raans, n_classes = orbits_number)
+        orbits_number = orbits_number_of_starlink[idx] if constellation_name == "Starlink" else int(
+            input('\t\t\tPlease enter the number of orbits (integer) based on the raan distribution result of the line '
+                  'chart : '))
+        if constellation_name == "Starlink":
+            print(f'\t\t\tThe number of orbits for {sh.shell_name} based on the raan distribution result of the line '
+                  f'is \033[32m{orbits_number}\033[0m')
+            time.sleep(1)
+        breaks = jenkspy.jenks_breaks(values=raans, n_classes=orbits_number)
         orbit_raans = [(breaks[i], breaks[i + 1]) for i in range(len(breaks) - 1)]
         for ra_index, ra in enumerate(orbit_raans):
             lower_bound = ra[0]
             upper_bound = ra[1]
-            orbit = ORBIT.orbit(shell=sh , raan_lower_bound=lower_bound , raan_upper_bound=upper_bound)
+            orbit = ORBIT.orbit(shell=sh, raan_lower_bound=lower_bound, raan_upper_bound=upper_bound)
             for sat in sh.satellites:
                 if ra_index > 0:
                     if sat.tle_json["RA_OF_ASC_NODE"] > lower_bound and sat.tle_json["RA_OF_ASC_NODE"] <= upper_bound:
