@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -6,7 +6,9 @@ Date : 2023/12/09
 
 Function : This script is used to test whether a constellation can be generated normally.
 
-'''
+"""
+
+import kits.dir_utils as dir_utils
 import src.constellation_generation.by_TLE.constellation_configuration as constellation_configuration
 
 
@@ -29,4 +31,6 @@ def constellation_generation_test():
 
 
 if __name__ == '__main__':
+    print("\t\033[31mTest constellation generation by TLE\033[0m")
+    dir_utils.change_root()
     constellation_generation_test()
