@@ -1,4 +1,4 @@
-'''
+"""
 
 Author: yunanhou
 
@@ -18,35 +18,14 @@ Implementation method: When the bent-pipe mode communicates between two ends (de
                        within the satellite orbit period. Finally, the average of all timeslot values can be used as the
                        bent-pipe bandwidth for communication between A and B.
 
-'''
-import xml.etree.ElementTree as ET
-import src.TLE_constellation.constellation_entity.ground_station as GS
+"""
+
 from math import radians, cos, sin, asin, sqrt
-import numpy as np
+
 import math
-
-
-# Read xml document
-def xml_to_dict(element):
-    if len(element) == 0:
-        return element.text
-    result = {}
-    for child in element:
-        child_data = xml_to_dict(child)
-        if child.tag in result:
-            if type(result[child.tag]) is list:
-                result[child.tag].append(child_data)
-            else:
-                result[child.tag] = [result[child.tag], child_data]
-        else:
-            result[child.tag] = child_data
-    return result
-
-# Read xml document
-def read_xml_file(file_path):
-    tree = ET.parse(file_path)
-    root = tree.getroot()
-    return {root.tag: xml_to_dict(root)}
+import numpy as np
+import kits.xml_utils as xml_utils
+import src.TLE_constellation.constellation_entity.ground_station as GS
 
 
 # Calculate the distance between the user and a satellite (the calculation result takes into account the curvature of
@@ -64,7 +43,6 @@ def distance_between_satellite_and_user(groundstation , satellite , t):
     distance=2*asin(sqrt(a))*6371.0*1000 # the average radius of the earth is 6371km
     distance=np.round(distance/1000,3)  # convert the result to kilometers with three decimal places.
     return distance
-
 
 
 # Strategy 1 for users to choose which satellite above their heads to connect to: users always connect to the satellite
@@ -131,7 +109,6 @@ def latilong_to_descartes(transformed_object , object_type , t=None):
         return X, Y, Z
 
 
-
 # Function : given a point on land (user, POP or GS, etc.) and the coordinates of a satellite in the three-dimensional
 #            Cartesian system, determine whether the point on land can see the satellite.
 # Parameters:
@@ -156,8 +133,6 @@ def judgePointToSatellite(sat_x , sat_y , sat_z , point_x , point_y , point_z , 
         return True
 
 
-
-
 # Function : find all GSs within visible range of a satellite
 # Parameters:
 # minimum_elevation : the minimum elevation angle of the ground observation point, and the parameter unit is degrees (°)
@@ -179,8 +154,6 @@ def satellite_visible_all_GSs(satellite , GSs , t , minimum_elevation):
     return all_visible_GSs
 
 
-
-
 # Function : calculate the bandwidth between two communication endpoints in bent-pipe mode
 # Parameters:
 # source is the source of communication, and target is the destination of communication. Both parameters
@@ -194,7 +167,7 @@ def satellite_visible_all_GSs(satellite , GSs , t , minimum_elevation):
 # GS_capacity : the GS capacity of each ground station, such as 10 Gbps, etc.
 def bandwidth(source , target , dT , sh , ground_station_file , minimum_elevation = 25 , GS_capacity = 5.0):
     # read ground base station data
-    ground_station = read_xml_file(ground_station_file)
+    ground_station = xml_utils.read_xml_file(ground_station_file)
     # generate GS
     GSs = []
     for gs_count in range(1 , len(ground_station['GSs'])+1 , 1):
@@ -223,4 +196,3 @@ def bandwidth(source , target , dT , sh , ground_station_file , minimum_elevatio
     # calculate average bandwidth
     avg_bandwidth = sum(bandwidth_per_timeslot) / len(bandwidth_per_timeslot)
     return avg_bandwidth
-

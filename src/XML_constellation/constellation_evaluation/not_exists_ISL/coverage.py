@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -21,33 +21,12 @@ Implementation method: In bent-pipe mode, the coverage of the constellation is n
                        all timeslots to obtain the constellation coverage under each timeslot. Constellation coverage,
                        and finally average the value and return it as the final constellation coverage.
 
-'''
+"""
+
 import math
-import src.XML_constellation.constellation_entity.ground_station as GS
-import xml.etree.ElementTree as ET
+import kits.xml_utils as xml_utils
 import src.XML_constellation.constellation_entity.user as USER
-
-# Read xml document
-def xml_to_dict(element):
-    if len(element) == 0:
-        return element.text
-    result = {}
-    for child in element:
-        child_data = xml_to_dict(child)
-        if child.tag in result:
-            if type(result[child.tag]) is list:
-                result[child.tag].append(child_data)
-            else:
-                result[child.tag] = [result[child.tag], child_data]
-        else:
-            result[child.tag] = child_data
-    return result
-
-# Read xml document
-def read_xml_file(file_path):
-    tree = ET.parse(file_path)
-    root = tree.getroot()
-    return {root.tag: xml_to_dict(root)}
+import src.XML_constellation.constellation_entity.ground_station as GS
 
 
 # The Tile class is a class used to represent a certain area on the earth's surface. The area is represented by four
@@ -144,7 +123,6 @@ def user_visible_all_satellites(user , t , sh , minimum_elevation):
     return user_visible_all_satellites_list
 
 
-
 # Function : Determine whether among all the satellites in the satellites collection, there is at least one satellite
 #            with at least 1 GS within its visible range. If so, return true, otherwise return false
 # Parameters:
@@ -166,7 +144,6 @@ def judge_user_coveraged(satellites , t , GSs , minimum_elevation):
     return False
 
 
-
 # Function : Calculate the coverage of the constellation in bent-pipe mode
 # Parameters:
 # dT : how often to record a timeslot
@@ -183,7 +160,7 @@ def coverage(dT , sh , ground_station_file , minimum_elevation = 25 , tile_size=
             tile = Tile(lon, lon + tile_size, lat, lat + tile_size)
             Tiles.append(tile)
     # read ground base station data
-    ground_station = read_xml_file(ground_station_file)
+    ground_station = xml_utils.read_xml_file(ground_station_file)
     # generate GS
     GSs = []
     for gs_count in range(1, len(ground_station['GSs']) + 1, 1):

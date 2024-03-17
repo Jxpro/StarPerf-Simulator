@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -7,41 +7,17 @@ Date : 2023/12/06
 Function : Given a number of satellites, draw the sub-satellite point trajectories of these satellites within an
            orbital period based on their TLE data.
 
-'''
+"""
+
 from datetime import datetime, timedelta
-import src.constellation_generation.by_TLE.get_satellite_position as GET_SATELLITE_POSITION
 from pyecharts import options as opts
 from pyecharts.charts import Geo
-import xml.etree.ElementTree as ET
-import src.TLE_constellation.constellation_entity.ground_station as GS
+
+import kits.xml_utils as xml_utils
 import src.TLE_constellation.constellation_entity.POP as POP_POINT
+import src.TLE_constellation.constellation_entity.ground_station as GS
+import src.constellation_generation.by_TLE.get_satellite_position as GET_SATELLITE_POSITION
 import src.constellation_generation.by_TLE.constellation_configuration as constellation_configuration
-
-
-# Read xml document
-def xml_to_dict(element):
-    if len(element) == 0:
-        return element.text
-    result = {}
-    for child in element:
-        child_data = xml_to_dict(child)
-        if child.tag in result:
-            if type(result[child.tag]) is list:
-                result[child.tag].append(child_data)
-            else:
-                result[child.tag] = [result[child.tag], child_data]
-        else:
-            result[child.tag] = child_data
-    return result
-
-# Read xml document
-def read_xml_file(file_path):
-    tree = ET.parse(file_path)
-    root = tree.getroot()
-    return {root.tag: xml_to_dict(root)}
-
-
-
 
 
 # Parameter :
@@ -86,7 +62,7 @@ def draw_subsatellite_point_track_and_GSs():
         all_moments_subsatellite_points_longitude_latitude.append(moment_subsatellite_points_longitude_latitude)
 
     # read ground base station data
-    ground_station = read_xml_file(ground_station_file)
+    ground_station = xml_utils.read_xml_file(ground_station_file)
     # generate GS
     GSs = []
     for gs_count in range(1, len(ground_station['GSs']) + 1, 1):
@@ -99,7 +75,7 @@ def draw_subsatellite_point_track_and_GSs():
                                 downlink_GHz=float(ground_station['GSs']['GS' + str(gs_count)]['Downlink_Ghz']))
         GSs.append(gs)
     # read ground POP point data
-    POP = read_xml_file(POP_file)
+    POP = xml_utils.read_xml_file(POP_file)
     # generate POP
     POPs = []
     for pop_count in range(1, len(POP['POPs']) + 1, 1):
@@ -127,4 +103,3 @@ def draw_subsatellite_point_track_and_GSs():
     trajectory_GS_POP.set_global_opts(title_opts=opts.TitleOpts(title="sub-satellite point track,GSs and POPs"))
     trajectory_GS_POP.render('data/trajectory_GS_POP.html')
     print("\t\t\tThe trajectory_GS_POP.html.html file has been generated and is located under \"data/\".")
-

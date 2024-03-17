@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -12,37 +12,17 @@ Specific idea: Read the "COSPAR_ID" field in the constellation's satellite launc
                belongs to, because the shell the satellite is in is related to the batch it is launched from, and the
                satellite launch batch is identified by a unique "OBJECT_ID" field.
 
-'''
-import xml.etree.ElementTree as ET
-import h5py
+"""
+
 from datetime import datetime
-import numpy as np
+
+import h5py
 import json
+import numpy as np
+import kits.xml_utils as xml_utils
+import src.TLE_constellation.constellation_entity.shell as SHELL
 import src.TLE_constellation.constellation_entity.launch as LAUNCH
 import src.TLE_constellation.constellation_entity.satellite as SATELLITE
-import src.TLE_constellation.constellation_entity.shell as SHELL
-
-
-
-def xml_to_dict(element):
-    if len(element) == 0:
-        return element.text
-    result = {}
-    for child in element:
-        child_data = xml_to_dict(child)
-        if child.tag in result:
-            if type(result[child.tag]) is list:
-                result[child.tag].append(child_data)
-            else:
-                result[child.tag] = [result[child.tag], child_data]
-        else:
-            result[child.tag] = child_data
-    return result
-
-def read_xml_file(file_path):
-    tree = ET.parse(file_path)
-    root = tree.getroot()
-    return {root.tag: xml_to_dict(root)}
 
 
 # Parameter :
@@ -54,7 +34,7 @@ def satellite_to_shell_mapping(constellation_name):
     constellation_launches_file = "config/TLE_constellation/" + constellation_name + \
                                   "/launches.xml"
     # read constellation launches information
-    constellation_launches_information = read_xml_file(constellation_launches_file)
+    constellation_launches_information = xml_utils.read_xml_file(constellation_launches_file)
     # the following launches list is used to store launch class objects generated based on satellite launch batch data
     # read from xml
     launches = []
@@ -78,7 +58,6 @@ def satellite_to_shell_mapping(constellation_name):
         shells.append(SHELL.shell(lai[0] , lai[1] , "shell" + str(count)))
         count = count + 1
 
-
     # TLE data file
     constellation_json_TLE_file = "config/TLE_constellation/" + constellation_name + "/tle.h5"
     with h5py.File(constellation_json_TLE_file, 'a') as file:
@@ -94,12 +73,10 @@ def satellite_to_shell_mapping(constellation_name):
         # convert string to JSON object
         TLE_JSON = [json.loads(item) for item in TLE_JSON]
 
-
     satellites = []
     for index in range(len(TLE_2LE)):
         satellite = SATELLITE.satellite(tle_json = TLE_JSON[index] , tle_2le = TLE_2LE[index])
         satellites.append(satellite)
-
 
     # determine the launch object of the satellite based on the first 8 bits of the "OBJECT_ID" field in the satellite
     # TLE data, and then determine the shell to which the satellite belongs based on the "altitude" and "inclination"
@@ -119,7 +96,6 @@ def satellite_to_shell_mapping(constellation_name):
                 sat.shell = sh
                 break
 
-
     # calculate the orbit cycle of every shell
     for shell in shells:
         orbit_period = float('-inf')
@@ -127,8 +103,6 @@ def satellite_to_shell_mapping(constellation_name):
             orbit_period = max(orbit_period, 1 / satellite.tle_json["MEAN_MOTION"] * 24 * 60 * 60)
         shell.orbit_cycle = int(orbit_period)
 
-
     # at this point in the code execution, the relationship between the satellite and the shell has been mapped
     # now return to shells
     return shells
-

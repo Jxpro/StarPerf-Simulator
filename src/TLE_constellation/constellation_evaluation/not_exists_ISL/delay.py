@@ -1,11 +1,10 @@
-'''
+"""
 
 Author: yunanhou
 
 Date : 2023/12/16
 
 Function : Calculate the communication delay between two ground users in bent-pipe mode
-
 
 Implementation method: When the bent-pipe mode communicates between two terminals (denoted as terminal A and terminal
                        B), the process is: terminal A → satellite 1 → ground station A → POP point 1 → terminal B, or
@@ -17,37 +16,15 @@ Implementation method: When the bent-pipe mode communicates between two terminal
                        point 1 → POP point 2, it is expressed by dividing the great circle distance on the earth's
                        surface by a certain speed.
 
-'''
-import xml.etree.ElementTree as ET
+"""
+
 from math import radians, cos, sin, asin, sqrt
-import numpy as np
+
 import math
-import src.TLE_constellation.constellation_entity.ground_station as GS
+import numpy as np
+import kits.xml_utils as xml_utils
 import src.TLE_constellation.constellation_entity.POP as POP_POINT
-
-
-# Read xml document
-def xml_to_dict(element):
-    if len(element) == 0:
-        return element.text
-    result = {}
-    for child in element:
-        child_data = xml_to_dict(child)
-        if child.tag in result:
-            if type(result[child.tag]) is list:
-                result[child.tag].append(child_data)
-            else:
-                result[child.tag] = [result[child.tag], child_data]
-        else:
-            result[child.tag] = child_data
-    return result
-
-# Read xml document
-def read_xml_file(file_path):
-    tree = ET.parse(file_path)
-    root = tree.getroot()
-    return {root.tag: xml_to_dict(root)}
-
+import src.TLE_constellation.constellation_entity.ground_station as GS
 
 
 # Function : given the longitude and latitude of two points on the earth's surface, calculate the distance between the
@@ -70,7 +47,6 @@ def distance_two_terrestrial_point(point1 , point2):
     return distance
 
 
-
 # Function : calculate the distance between the user and a satellite (the calculation result takes into account the
 #            curvature of the earth), the unit of the return value is kilometers
 def distance_between_satellite_and_user(groundstation , satellite , t):
@@ -88,7 +64,6 @@ def distance_between_satellite_and_user(groundstation , satellite , t):
     # convert the result to kilometers with three decimal places.
     distance=np.round(distance/1000,3)
     return distance
-
 
 
 # Function : convert the latitude and longitude coordinates of ground GS/POP points/user terminals/satellites into
@@ -126,8 +101,6 @@ def latilong_to_descartes(transformed_object , object_type , t=None):
         return X, Y, Z
 
 
-
-
 # Function : given a point on land (user, POP or GS, etc.) and the coordinates of a satellite in the three-dimensional
 #            Cartesian system, determine whether the point on land can see the satellite.
 # Parameters:
@@ -150,7 +123,6 @@ def judgePointToSatellite(sat_x , sat_y , sat_z , point_x , point_y , point_z , 
         return False
     else:
         return True
-
 
 
 # Function : Strategy 1 for users to choose which satellite above their heads to connect to: users always
@@ -182,7 +154,6 @@ def user_connect_satelite_policy1(source , target , sh , t):
     return nearest_satellite_to_source , nearest_satellite_to_target
 
 
-
 # Function : Strategy 1 for satellites in the sky to choose which ground station to establish a connection with: the
 #            satellite forwards to the ground station closest to the user within its visible range
 # Parameters:
@@ -210,9 +181,6 @@ def satellite_connect_groundstation_policy1(user , satellite , GSs , t , minimum
     return nearest_GS_to_user
 
 
-
-
-
 # Parameters:
 # source is the source of communication, and target is the destination of communication. Both the two parameters
 # are user class objects.
@@ -232,7 +200,7 @@ def satellite_connect_groundstation_policy1(user , satellite , GSs , t , minimum
 #                      angle of the ground observation point. The units of these two parameters are degrees (°).
 def delay(source , target , dT , sh , ground_station_file , POP_file , α = 1.1 , β = 1.0 , minimum_elevation = 25):
     # read ground base station data
-    ground_station = read_xml_file(ground_station_file)
+    ground_station = xml_utils.read_xml_file(ground_station_file)
     # generate GS
     GSs = []
     for gs_count in range(1, len(ground_station['GSs']) + 1, 1):
@@ -245,7 +213,7 @@ def delay(source , target , dT , sh , ground_station_file , POP_file , α = 1.1 
                                downlink_GHz=float(ground_station['GSs']['GS' + str(gs_count)]['Downlink_Ghz']))
         GSs.append(gs)
     # read ground POP point data
-    POP = read_xml_file(POP_file)
+    POP = xml_utils.read_xml_file(POP_file)
     # generate POP
     POPs = []
     for pop_count in range(1, len(POP['POPs']) + 1, 1):

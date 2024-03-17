@@ -1,4 +1,4 @@
-'''
+"""
 
 Author: yunanhou
 
@@ -13,33 +13,14 @@ adjacent satellites are within this distance range.
 
 To simplify matters, we assume that ISL will not be disconnected and rebuilt once established.
 
-'''
-import h5py
-import xml.etree.ElementTree as ET
+"""
+
 from math import radians, cos, sin, asin, sqrt
+
+import h5py
 import numpy as np
+import kits.xml_utils as xml_utils
 import src.TLE_constellation.constellation_entity.ISL as ISL_module
-
-def xml_to_dict(element):
-    if len(element) == 0:
-        return element.text
-    result = {}
-    for child in element:
-        child_data = xml_to_dict(child)
-        if child.tag in result:
-            if type(result[child.tag]) is list:
-                result[child.tag].append(child_data)
-            else:
-                result[child.tag] = [result[child.tag], child_data]
-        else:
-            result[child.tag] = child_data
-    return result
-
-def read_xml_file(file_path):
-    tree = ET.parse(file_path)
-    root = tree.getroot()
-    return {root.tag: xml_to_dict(root)}
-
 
 
 # Function : Calculate the distance between two satellites (the calculation result takes into account the curvature
@@ -97,11 +78,10 @@ def n_nearest(constellation , dT , n):
             for count in range(1, constellation.number_of_shells + 1, 1):
                 delay_group.create_group('shell' + str(count))
 
-
     # get ISL shortest distance and longest distance (unit : km)
     ISL_distance_range_file_path = \
         "src/TLE_constellation/constellation_connectivity/connectivity_plugin/ISL_distance_range.xml"
-    ISL_distance_range = read_xml_file(ISL_distance_range_file_path)
+    ISL_distance_range = xml_utils.read_xml_file(ISL_distance_range_file_path)
     shortest_distance = float(ISL_distance_range["ISL_distance_range"]["shortest_distance"])
     longest_distance = float(ISL_distance_range["ISL_distance_range"]["longest_distance"])
 
