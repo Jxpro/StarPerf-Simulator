@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -6,7 +6,10 @@ Date : 2023/11/26
 
 Function : This script is used to test each tool script under "kits/" in starperf 2.0
 
-'''
+"""
+
+import kits.dir_utils as dir_utils
+
 
 def kits_test_cases():
     print("\t\t\033[31mTest(01/08) : get the h3id of all cells with h3 library resolution 0-4\033[0m")
@@ -60,5 +63,7 @@ def kits_test_cases():
     import kits.draw_subsatellite_point_track_and_GSs as draw
     draw.draw_subsatellite_point_track_and_GSs()
 
+
 if __name__ == "__main__":
+    dir_utils.change_root()
     kits_test_cases()

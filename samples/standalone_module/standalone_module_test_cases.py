@@ -1,4 +1,4 @@
-'''
+"""
 
 Author: yunanhou
 
@@ -6,11 +6,9 @@ Date : 2023/12/25
 
 Function : This script is used to test each tool script under "src/standalone_module/" in starperf 2.0
 
-'''
+"""
 
-
-
-
+import kits.dir_utils as dir_utils
 
 
 def standalone_module_test_cases():
@@ -26,4 +24,5 @@ def standalone_module_test_cases():
 
 
 if __name__ == '__main__':
+    dir_utils.change_root()
     standalone_module_test_cases()

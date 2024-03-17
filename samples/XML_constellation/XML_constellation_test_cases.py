@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -7,7 +7,10 @@ Date : 2023/11/26
 Function : This script is used to test the core module functionality of various XML constellations
 
 
-'''
+"""
+
+import kits.dir_utils as dir_utils
+
 
 def XML_constellation_test_cases():
     print("\t\t\033[31mTest(01/16) : constellation generation\033[0m")
@@ -97,4 +100,5 @@ def XML_constellation_test_cases():
 
 
 if __name__ == "__main__":
+    dir_utils.change_root()
     XML_constellation_test_cases()

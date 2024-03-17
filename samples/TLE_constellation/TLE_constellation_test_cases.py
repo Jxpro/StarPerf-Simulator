@@ -1,4 +1,4 @@
-'''
+"""
 
 Author : yunanhou
 
@@ -6,7 +6,9 @@ Date : 2023/12/15
 
 Function : This script is used to test the core module functionality of various TLE constellations
 
-'''
+"""
+
+import kits.dir_utils as dir_utils
 
 
 def TLE_constellation_test_cases():
@@ -94,6 +96,6 @@ def TLE_constellation_test_cases():
     BENT_PIPE_SUNSTORM_DAMAGED_SATELLITES_TEST.sunstorm_damaged_satellites()
 
 
-
 if __name__ == "__main__":
+    dir_utils.change_root()
     TLE_constellation_test_cases()
